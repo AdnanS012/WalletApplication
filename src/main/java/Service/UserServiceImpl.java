@@ -68,5 +68,11 @@ public UserServiceImpl(IUserRepository userRepository) {
         }
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), Collections.emptyList());
     }
+    @Override
+    public User getUserByUsername(String username) {
+        UserDetails userDetails = loadUserByUsername(username);
+        return userRepository.findByUsername(userDetails.getUsername());
+    }
+
 }
 

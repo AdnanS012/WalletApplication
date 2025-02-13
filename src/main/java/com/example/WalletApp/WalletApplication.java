@@ -2,9 +2,10 @@ package com.example.WalletApp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 
-@SpringBootApplication(scanBasePackages = "com.example.WalletApp")
- // Entry point of the Spring Boot application
+@SpringBootApplication
+@EntityScan(basePackages = "com.example.WalletApp.Domain") // Ensure this matches the full package name of your User class
 public class WalletApplication {
     public static void main(String[] args) {
         SpringApplication.run(WalletApplication.class, args);

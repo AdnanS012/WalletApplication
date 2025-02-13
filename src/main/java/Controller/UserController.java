@@ -1,5 +1,6 @@
 package Controller;
 
+import Domain.User;
 import Money.Money;
 import Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,4 +63,14 @@ public class UserController {
 
 
     }
+    @GetMapping("/{username}")
+    public ResponseEntity<User> getUser(@PathVariable String username) {
+        try {
+            User user = userService.getUserByUsername(username);
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
 }
