@@ -1,16 +1,16 @@
 package Service;
 
 import Domain.User;
-import UserRepository.IUserRepository;
-import jakarta.transaction.Transactional;
+import Domain.Money;
+import Repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import Money.Money;
 
+import javax.transaction.Transactional;
 import java.util.Collections;
+
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
@@ -18,7 +18,6 @@ public class UserServiceImpl implements UserService {
 
 private final IUserRepository userRepository;
 
-@Autowired
 public UserServiceImpl(IUserRepository userRepository) {
     this.userRepository = userRepository;
 }
@@ -70,8 +69,8 @@ public UserServiceImpl(IUserRepository userRepository) {
     }
     @Override
     public User getUserByUsername(String username) {
-        UserDetails userDetails = loadUserByUsername(username);
-        return userRepository.findByUsername(userDetails.getUsername());
+        return userRepository.findByUsername(username);
+
     }
 
 }

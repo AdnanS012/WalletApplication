@@ -2,8 +2,8 @@ package com.example.WalletApp;
 
 
 import Domain.User;
-import Money.Money;
-import UserRepository.IUserRepository;
+import Domain.Money;
+import Repository.IUserRepository;
 import Service.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

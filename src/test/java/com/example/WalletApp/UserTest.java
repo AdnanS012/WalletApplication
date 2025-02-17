@@ -1,7 +1,7 @@
 package com.example.WalletApp;
 
 import Domain.User;
-import Money.Money;
+import Domain.Money;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

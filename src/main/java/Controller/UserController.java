@@ -1,7 +1,7 @@
 package Controller;
 
 import Domain.User;
-import Money.Money;
+import Domain.Money;
 import Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +23,9 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<String> register(@RequestBody User user) {
         try {
-            userService.registerUser(username, password);
+            userService.registerUser(user.getUsername(), user.getPassword());
             return ResponseEntity.ok("User registered successfully!");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Internal Server Error");
@@ -35,13 +35,13 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password) {
-        boolean authenticated = userService.authenticateUser(username, password);
-        return authenticated ? "Login successful!" : "Invalid credentials!";
+    public ResponseEntity<String> login(@RequestBody User user) {
+        boolean authenticated = userService.authenticateUser(user.getUsername(),user.getPassword());
+        return authenticated ? ResponseEntity.ok("Login successful!") : ResponseEntity.status(401).body("Invalid credentials");
 
     }
 
-    @PostMapping("/{username}/deposit")
+    @PostMapping("/{username}/wallet/deposit")
     public ResponseEntity<String> deposit(@PathVariable String username, @RequestBody Money amount) {
         try {
             userService.deposit(username, amount);
@@ -52,7 +52,7 @@ public class UserController {
     }
 
 
-    @PostMapping("/{username}/withdraw")
+    @PostMapping("/{username}/wallet/withdraw")
     public ResponseEntity<String> withdraw(@PathVariable String username, @RequestBody Money amount) {
         try {
             userService.withdraw(username, amount);

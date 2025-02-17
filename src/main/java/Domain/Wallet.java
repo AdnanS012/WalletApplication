@@ -1,9 +1,5 @@
 package Domain;
 
-import Money.Money;
-
-import java.math.BigDecimal;
-
 public class Wallet {
     private Money balance;
 

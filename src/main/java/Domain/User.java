@@ -1,15 +1,14 @@
 package Domain;
 
-import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import Money.Money;
-import java.math.BigDecimal;
+
+import javax.persistence.*;
 import java.util.Collection;
 import java.util.Collections;
 
 @Entity
-@Table(name="usersDb")
+@Table(name="userstbl")
 public class User implements UserDetails {
 
     @Id
@@ -22,7 +21,7 @@ public class User implements UserDetails {
     private Wallet wallet;
     // No-argument constructor
     public User() {
-        this.wallet = new Wallet();
+
     }
     public User(String username, String password) {
         if(username==null || username.trim().isEmpty()){
