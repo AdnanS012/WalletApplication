@@ -42,27 +42,7 @@ public UserServiceImpl(IUserRepository userRepository,PasswordEncoder passwordEn
     User user = userRepository.findByUsername(username);
         return user != null && passwordEncoder.matches(password,user.getPassword());
     }
-    @Override
-    public void deposit(Long id, Money amount) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        user.depositToWallet(amount);
-        userRepository.save(user);
-    }
-
-    @Override
-    public void withdraw(Long id, Money amount) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        if (!user.canWithdrawFromWallet(amount)) {
-            throw new IllegalArgumentException("Insufficient balance");
-        }
-
-        user.withdrawFromWallet(amount);  //  Calls domain logic
-        userRepository.save(user);  // Persist changes
-    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -72,16 +52,7 @@ public UserServiceImpl(IUserRepository userRepository,PasswordEncoder passwordEn
         }
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), Collections.emptyList());
     }
-//    @Override
-//    public User getUserByUsername(String username) {
-//        return userRepository.findByUsername(username);
-//
-//    }
-//    @Override
-//    public User getUserById(Long id) {
-//        return userRepository.findById(id)
-//                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-//    }
+
 @Override
 public UserResponse getUserById(Long id) {
     User user = userRepository.findById(id)

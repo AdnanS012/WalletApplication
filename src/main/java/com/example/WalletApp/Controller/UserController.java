@@ -47,29 +47,7 @@ public class UserController {
 
     }
 
-    @PostMapping("/{id}/wallets/deposit")
-    public ResponseEntity<String> deposit(@PathVariable Long id, @RequestBody Money amount) {
-        try {
-            userService.deposit(id, amount);
-            return ResponseEntity.ok("Deposit successful!");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
 
-
-
-    @PostMapping("/{id}/wallet/withdraw")
-    public ResponseEntity<String> withdraw(@PathVariable Long id, @RequestBody Money amount) {
-        try {
-            userService.withdraw(id, amount);
-            return ResponseEntity.ok("Withdrawal successful!");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Internal Server Error");
-        }
-    }
     @GetMapping("/by-username/{username}")
     public ResponseEntity<UserResponse> userDetailsByName(@PathVariable String username) {
         try {

@@ -51,54 +51,7 @@ public class UserServiceTest {
         assertThrows(IllegalArgumentException.class, () -> userService.registerUser("duplicateUser", "password123"),
                 "Duplicate registration should throw exception");
     }
-    @Test
-    public void testDepositToNonExistentUserThrowsException() {
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class, () ->
-                userService.deposit(1L, new Money(new BigDecimal("50.00")))
-        );
-        verify(userRepository, never()).save(any(User.class));
-    }
-    @Test
-    public void testWithdrawFromWalletSuccessfully() {
-        User user = new User("testUser", "securePassword");
-        user.depositToWallet(new Money(new BigDecimal("100.00")));
-        when(userRepository.findById((1L))).thenReturn(Optional.of(user));
 
-        Money withdrawalAmount = new Money(new BigDecimal("50.00"));
-        userService.withdraw(1L, withdrawalAmount);
-
-        assertTrue(user.canWithdrawFromWallet(new Money(new BigDecimal("50.00"))),
-                "User should be able to withdraw the remaining balance");
-
-        verify(userRepository, times(1)).save(user);
-    }
-
-    @Test
-    public void testWithdrawFromWalletWithInsufficientBalanceThrowsException() {
-        User user = new User("testUser", "securePassword");
-        user.depositToWallet(new Money(new BigDecimal("50.00")));
-        when(userRepository.findById((1L))).thenReturn(Optional.of(user));
-
-        Money withdrawalAmount = new Money(new BigDecimal("100.00"));
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            userService.withdraw(1L, withdrawalAmount);
-        });
-
-        assertTrue(exception.getMessage().contains("Insufficient balance"),
-                "Exception message should contain 'Insufficient balance'");
-    }
-
-
-    @Test
-    public void testWithdrawFromNonExistentUserThrowsException() {
-        when(userRepository.findById((1L))).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class, () ->
-                userService.withdraw(1L, new Money(new BigDecimal("50.00")))
-        );
-        verify(userRepository, never()).save(any(User.class));
-    }
     @Test
     public void testAuthenticateUserSuccessfully() {
         User user = new User("testUser", "encodedPassword");

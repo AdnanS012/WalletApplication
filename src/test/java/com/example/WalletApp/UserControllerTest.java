@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
 
-//@WebMvcTest(UserController.class)
+
 public class UserControllerTest {
 
     //@Autowired
@@ -51,47 +51,6 @@ public class UserControllerTest {
                 .andExpect(content().string("User registered successfully!"));
 
         verify(userService, times(1)).registerUser("testUser", "securePassword");
-    }
-
-    @Test
-    public void testDepositToWallet() throws Exception {
-        doNothing().when(userService).deposit(eq(1L), any(Money.class));
-
-        mockMvc.perform(post("/api/users/1/wallets/deposit")
-                        .contentType(MediaType.APPLICATION_JSON)  //  Set request content type
-                        .content("{\"amount\": 100.00}")  //  Send JSON instead of .param()
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())  //  Expect HTTP 200 OK
-                .andExpect(content().string("Deposit successful!"));
-
-        verify(userService, times(1)).deposit( eq(1L), any(Money.class));
-    }
-
-    @Test
-    public void testWithdrawFromWallet() throws Exception {
-        doNothing().when(userService).withdraw(eq(1L), any(Money.class));
-
-        mockMvc.perform(post("/api/users/1/wallet/withdraw")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"amount\": 50.00}")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Withdrawal successful!"));
-
-        verify(userService, times(1)).withdraw(eq(1L), any(Money.class));
-    }
-    @Test
-    public void testWithdrawFailure() throws Exception {
-        doThrow(new RuntimeException("Withdrawal failed")).when(userService).withdraw(eq(1L), any(Money.class));
-
-        mockMvc.perform(post("/api/users/1/wallet/withdraw")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"amount\": 50.00}")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().string("Internal Server Error"));
-
-        verify(userService, times(1)).withdraw(eq(1L), any(Money.class));
     }
 
     @Test
