@@ -1,7 +1,7 @@
 package com.example.WalletApp;
 
-import Domain.Wallet;
-import Domain.Money;
+import com.example.WalletApp.Domain.Wallet;
+import com.example.WalletApp.Domain.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

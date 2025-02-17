@@ -1,5 +1,7 @@
-package Domain;
+package com.example.WalletApp.Domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -12,10 +14,13 @@ import java.util.Collections;
 public class User implements UserDetails {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) //Auto-increment id
+    private Long id;
     @Column(nullable = false,unique = true)
     private String username;
     @Column(nullable = false)
     private String password;
+
 
     @Embedded
     private Wallet wallet;
@@ -60,10 +65,20 @@ public class User implements UserDetails {
         return password;
     }
 
+    public Long identify() {
+        return this.id;
+    }
+    @JsonProperty("walletBalance")
+    public Money getBalanceForResponse() {
+        return this.wallet.provideBalance();
+    }
+
+
     @Override
     public String getUsername() {
         return username;
     }
+
     @Override
     public boolean isAccountNonExpired() { return true; }
 
