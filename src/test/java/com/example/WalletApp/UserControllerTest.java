@@ -61,7 +61,7 @@ public class UserControllerTest {
         mockMvc.perform(get("/api/users/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string("{\"id\":1,\"username\":\"testUser\",\"walletBalance\":{\"amount\":100.00}}"));
+                .andExpect(content().json("{\"id\":1,\"username\":\"testUser\",\"walletBalance\":{\"amount\":100.00},\"message\":null}"));
 
         verify(userService, times(1)).getUserById(1L);
     }
@@ -75,7 +75,7 @@ public class UserControllerTest {
         mockMvc.perform(get("/api/users/by-username/testUser")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string("{\"id\":1,\"username\":\"testUser\",\"walletBalance\":{\"amount\":100.00}}"));
+                .andExpect(content().json("{\"id\":1,\"username\":\"testUser\",\"walletBalance\":{\"amount\":100.00},\"message\":null}"));
 
         verify(userService, times(1)).getUserByUsername("testUser");
     }

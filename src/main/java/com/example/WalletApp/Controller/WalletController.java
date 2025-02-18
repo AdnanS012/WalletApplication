@@ -45,8 +45,5 @@ public class WalletController {
             return ResponseEntity.badRequest().body(null);
         }
     }
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
-    }
+
 }

@@ -28,6 +28,9 @@ public class UserController {
 
     @PostMapping //create a new user with username and password
     public ResponseEntity<String> register(@RequestBody User user) {
+        if (user.getUsername() == null || user.getUsername().isEmpty()) {
+            return ResponseEntity.badRequest().body("Username cannot be empty");
+        }
         try {
             userService.registerUser(user.getUsername(), user.getPassword());
             return ResponseEntity.ok("User registered successfully!");
@@ -68,14 +71,16 @@ public class UserController {
     public ResponseEntity<UserResponse> userDetailsById(@PathVariable Long id) {
         try {
             UserResponse userResponse = userService.getUserById(id);
-            System.out.println(userResponse);
-            log.info("User response :{}",userResponse);
            return ResponseEntity.ok(userResponse);
 
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
+            UserResponse errorResponse = new UserResponse();
+            errorResponse.setMessage(e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);
+            UserResponse errorResponse = new UserResponse();
+            errorResponse.setMessage("Internal Server Error");
+            return ResponseEntity.status(500).body(errorResponse);
         }
     }
     @ExceptionHandler(IllegalArgumentException.class)
