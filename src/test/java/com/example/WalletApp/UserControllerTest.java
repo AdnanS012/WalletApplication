@@ -108,7 +108,7 @@ public class UserControllerTest {
         mockMvc.perform(get("/api/users/by-username/nonExistentUser")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("User not found"));
+                .andExpect(jsonPath("$.message").value("User not found"));
 
         verify(userService, times(1)).getUserByUsername("nonExistentUser");
     }

@@ -7,6 +7,7 @@ public class UserResponse {
     private Long id;
     @JsonProperty("username")
     private String username;
+    private String message;
 
     @JsonProperty("walletBalance")
     private Money walletBalance;
@@ -16,6 +17,11 @@ public class UserResponse {
         this.username = username;
         this.walletBalance = walletBalance;
     }
+
+    public UserResponse() {
+
+    }
+
     public Long getId() {
         return id;
     }
@@ -25,6 +31,13 @@ public class UserResponse {
 
     public Money walletBalance() {
         return walletBalance;
+    }
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
 }

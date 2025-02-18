@@ -54,9 +54,14 @@ public class UserController {
             UserResponse userResponse = userService.getUserByUsername(username);
             return ResponseEntity.ok(userResponse);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
+            UserResponse errorResponse = new UserResponse();
+            errorResponse.setMessage(e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);
+            UserResponse errorResponse = new UserResponse();
+            errorResponse.setMessage("Internal Server Error");
+
+            return ResponseEntity.status(500).body(errorResponse);
         }
     }
     @GetMapping("/{id}")
@@ -72,6 +77,10 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null);
         }
+    }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 
 }
