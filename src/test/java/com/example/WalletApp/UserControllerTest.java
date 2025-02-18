@@ -79,4 +79,37 @@ public class UserControllerTest {
 
         verify(userService, times(1)).getUserByUsername("testUser");
     }
+    @Test
+    public void testRegisterUserWithEmptyUsername() throws Exception {
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\": \"\", \"password\": \"securePassword\"}"))
+                .andExpect(status().isBadRequest());
+
+        verify(userService, never()).registerUser(anyString(), anyString());
+    }
+    @Test
+    public void testLoginWithInvalidCredentials() throws Exception {
+        when(userService.authenticateUser("testUser", "wrongPassword")).thenReturn(false);
+
+        mockMvc.perform(post("/api/users/auth/sign-in")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\": \"testUser\", \"password\": \"wrongPassword\"}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().string("Invalid credentials"));
+
+        verify(userService, times(1)).authenticateUser("testUser", "wrongPassword");
+    }
+
+    @Test
+    public void testGetUserByNonExistentUsername() throws Exception {
+        when(userService.getUserByUsername("nonExistentUser")).thenThrow(new IllegalArgumentException("User not found"));
+
+        mockMvc.perform(get("/api/users/by-username/nonExistentUser")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("User not found"));
+
+        verify(userService, times(1)).getUserByUsername("nonExistentUser");
+    }
 }
