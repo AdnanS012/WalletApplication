@@ -1,6 +1,6 @@
 package com.example.WalletApp.Domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.example.WalletApp.Service.CurrencyConversionService;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Currency;
 
 @Entity
 @Table(name="userstbl")
@@ -25,9 +26,10 @@ public class User implements UserDetails {
     @Embedded
     private Wallet wallet;
     // No-argument constructor
-    public User() {
-
+    protected User() {
+        this.wallet = new Wallet();
     }
+
     public User(String username, String password) {
         if(username==null || username.trim().isEmpty()){
             throw new IllegalArgumentException("Username cannot be empty");
@@ -73,11 +75,20 @@ public class User implements UserDetails {
         return this.wallet.provideBalance();
     }
 
+    public void updateWalletCurrency(Currency newCurrency, CurrencyConversionService currencyConversionService) {
+        this.wallet.updateCurrency(newCurrency,currencyConversionService);
+    }
+
+
 
     @Override
     public String getUsername() {
         return username;
     }
+    public Currency getCurrency() {
+        return wallet.getCurrency();
+    }
+
 
     @Override
     public boolean isAccountNonExpired() { return true; }

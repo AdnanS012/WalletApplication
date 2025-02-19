@@ -29,12 +29,7 @@ public class UserResponse {
         return username;
     }
 
-    public Money walletBalance() {
-        return walletBalance;
-    }
-    public String getMessage() {
-        return message;
-    }
+
 
     public void setMessage(String message) {
         this.message = message;

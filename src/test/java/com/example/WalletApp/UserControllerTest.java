@@ -20,6 +20,7 @@ import com.example.WalletApp.Domain.Money;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
+import java.util.Currency;
 
 
 public class UserControllerTest {
@@ -55,13 +56,13 @@ public class UserControllerTest {
 
     @Test
     public void testGetUserById() throws Exception {
-        UserResponse userResponse = new UserResponse(1L, "testUser", new Money(new BigDecimal("100.00")));
+        UserResponse userResponse = new UserResponse(1L, "testUser", new Money(new BigDecimal("100.00"), Currency.getInstance("INR")));
         when(userService.getUserById(1L)).thenReturn(userResponse);
 
         mockMvc.perform(get("/api/users/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"id\":1,\"username\":\"testUser\",\"walletBalance\":{\"amount\":100.00},\"message\":null}"));
+                .andExpect(content().json("{\"id\":1,\"username\":\"testUser\",\"walletBalance\":{\"amount\":100.00},\"message\":\"Success\"}"));
 
         verify(userService, times(1)).getUserById(1L);
     }
@@ -69,13 +70,13 @@ public class UserControllerTest {
 
     @Test
     public void testGetUserByUsername() throws Exception {
-        UserResponse userResponse = new UserResponse(1L, "testUser", new Money(new BigDecimal("100.00")));
+        UserResponse userResponse = new UserResponse(1L, "testUser", new Money(new BigDecimal("100.00"),Currency.getInstance("INR")));
         when(userService.getUserByUsername("testUser")).thenReturn(userResponse);
 
         mockMvc.perform(get("/api/users/by-username/testUser")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"id\":1,\"username\":\"testUser\",\"walletBalance\":{\"amount\":100.00},\"message\":null}"));
+                .andExpect(content().json("{\"id\":1,\"username\":\"testUser\",\"walletBalance\":{\"amount\":100.00},\"message\":\"Success\"}"));
 
         verify(userService, times(1)).getUserByUsername("testUser");
     }

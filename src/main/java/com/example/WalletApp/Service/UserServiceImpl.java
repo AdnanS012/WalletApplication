@@ -2,7 +2,6 @@ package com.example.WalletApp.Service;
 
 import com.example.WalletApp.DTO.UserResponse;
 import com.example.WalletApp.Domain.User;
-import com.example.WalletApp.Domain.Money;
 import com.example.WalletApp.Repository.IUserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

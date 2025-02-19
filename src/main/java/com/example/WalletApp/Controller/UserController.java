@@ -2,7 +2,6 @@ package com.example.WalletApp.Controller;
 
 import com.example.WalletApp.DTO.UserResponse;
 import com.example.WalletApp.Domain.User;
-import com.example.WalletApp.Domain.Money;
 import com.example.WalletApp.Service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +54,7 @@ public class UserController {
     public ResponseEntity<UserResponse> userDetailsByName(@PathVariable String username) {
         try {
             UserResponse userResponse = userService.getUserByUsername(username);
+            userResponse.setMessage("Success");
             return ResponseEntity.ok(userResponse);
         } catch (IllegalArgumentException e) {
             UserResponse errorResponse = new UserResponse();
@@ -71,6 +71,7 @@ public class UserController {
     public ResponseEntity<UserResponse> userDetailsById(@PathVariable Long id) {
         try {
             UserResponse userResponse = userService.getUserById(id);
+            userResponse.setMessage("Success");
            return ResponseEntity.ok(userResponse);
 
         } catch (IllegalArgumentException e) {

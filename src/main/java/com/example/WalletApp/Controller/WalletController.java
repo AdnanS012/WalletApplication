@@ -1,13 +1,17 @@
 package com.example.WalletApp.Controller;
 
+import com.example.WalletApp.DTO.TransactionResponse;
 import com.example.WalletApp.Domain.Money;
 import com.example.WalletApp.Service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+
 @RestController
-@RequestMapping("/api/wallets")
+@RequestMapping("/users/{userId}/wallet")
 public class WalletController {
 
     private final WalletService walletService;
@@ -17,7 +21,7 @@ public class WalletController {
         this.walletService = walletService;
     }
 
-    @PostMapping("/{userId}/deposit")
+    @PostMapping("/deposit")
     public ResponseEntity<String> deposit(@PathVariable Long userId, @RequestBody Money amount) {
         try {
             walletService.deposit(userId, amount);
@@ -26,7 +30,7 @@ public class WalletController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    @PostMapping("/{userId}/withdraw")
+    @PostMapping("/withdraw")
     public ResponseEntity<String> withdraw(@PathVariable Long userId, @RequestBody Money amount) {
         try {
             walletService.withdraw(userId, amount);
@@ -36,7 +40,7 @@ public class WalletController {
         }
     }
 
-    @GetMapping("/{userId}/balance")
+    @GetMapping
     public ResponseEntity<Money> getBalance(@PathVariable Long userId) {
         try {
             Money balance = walletService.getBalance(userId);
@@ -45,5 +49,25 @@ public class WalletController {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+    @PostMapping("/transfer/{receiverId}")
+    public ResponseEntity<String> transfer(@PathVariable Long userId, @PathVariable Long receiverId, @RequestBody Money amount) {
+        try {
+            walletService.transferMoney(userId, receiverId, amount);
+            return ResponseEntity.ok("Transfer successful!");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    @GetMapping("/transactions")
+    public ResponseEntity<List<TransactionResponse>> getTransactions(@PathVariable Long userId) {
+        try {
+            List<TransactionResponse> transactions = walletService.getTransactions(userId);
+            return ResponseEntity.ok(transactions);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
 
 }
