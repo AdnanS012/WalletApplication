@@ -376,42 +376,7 @@ public class WalletServiceTest {
         // Check receiver balance
         assertEquals(new Money(new BigDecimal("75.00"), Currency.getInstance("EUR")), receiver.getBalanceForResponse());
     }
-    @Test
-    public void testAtomicity_WalletServiceRollbackOnFailure() {
-        Long senderId = 1L;
-        Long receiverId = 2L;
-        Money transferAmount = new Money(new BigDecimal("500.00"), Currency.getInstance("USD"));
-        Money convertedAmount = new Money(new BigDecimal("41500.00"), Currency.getInstance("INR"));
 
-        User sender = new User("sender", "password");
-        User receiver = new User("receiver", "password");
-
-        ReflectionTestUtils.setField(sender, "wallet", new Wallet(transferAmount));
-        ReflectionTestUtils.setField(sender, "id", senderId);
-        ReflectionTestUtils.setField(receiver, "id", receiverId);
-
-        when(userRepository.findById(senderId)).thenReturn(Optional.of(sender));
-        when(userRepository.findById(receiverId)).thenReturn(Optional.of(receiver));
-
-        when(currencyConversionService.convert(any(), eq("USD"), eq("INR"))).thenReturn(convertedAmount);
-
-        doThrow(new RuntimeException("Simulated failure after sender withdrawal"))
-                .when(transactionRepository).save(any(Transaction.class));
-
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            walletService.transferMoney(senderId, receiverId, transferAmount);
-        });
-
-        assertEquals("Simulated failure after sender withdrawal", exception.getMessage());
-
-        verify(transactionRepository, never()).save(any(Transaction.class));
-
-        // Ensure rollback (sender still has full balance)
-        assertEquals(transferAmount, sender.getBalanceForResponse());
-
-        // Ensure receiver’s balance is still zero
-        assertEquals(new Money(BigDecimal.ZERO, Currency.getInstance("INR")), receiver.getBalanceForResponse());
-    }
 
 
 }

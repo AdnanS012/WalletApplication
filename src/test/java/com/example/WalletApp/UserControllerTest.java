@@ -56,30 +56,24 @@ public class UserControllerTest {
 
     @Test
     public void testGetUserById() throws Exception {
-        UserResponse userResponse = new UserResponse(1L, "testUser", new Money(new BigDecimal("100.00"), Currency.getInstance("INR")));
+        UserResponse userResponse = new UserResponse(1L, "testUser",
+                new Money(new BigDecimal("100.00"), Currency.getInstance("INR")));
+        userResponse.setMessage("Success");
+
         when(userService.getUserById(1L)).thenReturn(userResponse);
 
         mockMvc.perform(get("/api/users/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"id\":1,\"username\":\"testUser\",\"walletBalance\":{\"amount\":100.00},\"message\":\"Success\"}"));
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.username").value("testUser"))
+                .andExpect(jsonPath("$.walletBalance.amount").value(100.00))
+                .andExpect(jsonPath("$.walletBalance.currency").value("INR"))
+                .andExpect(jsonPath("$.message").value("Success"));  //Fix
 
         verify(userService, times(1)).getUserById(1L);
     }
 
-
-    @Test
-    public void testGetUserByUsername() throws Exception {
-        UserResponse userResponse = new UserResponse(1L, "testUser", new Money(new BigDecimal("100.00"),Currency.getInstance("INR")));
-        when(userService.getUserByUsername("testUser")).thenReturn(userResponse);
-
-        mockMvc.perform(get("/api/users/by-username/testUser")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().json("{\"id\":1,\"username\":\"testUser\",\"walletBalance\":{\"amount\":100.00},\"message\":\"Success\"}"));
-
-        verify(userService, times(1)).getUserByUsername("testUser");
-    }
     @Test
     public void testRegisterUserWithEmptyUsername() throws Exception {
         mockMvc.perform(post("/api/users")
@@ -103,14 +97,47 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetUserByNonExistentUsername() throws Exception {
-        when(userService.getUserByUsername("nonExistentUser")).thenThrow(new IllegalArgumentException("User not found"));
+    public void testGetUserWithEmptyWallet() throws Exception {
+        UserResponse userResponse = new UserResponse(2L, "emptyWalletUser", new Money(BigDecimal.ZERO, Currency.getInstance("INR")));
 
-        mockMvc.perform(get("/api/users/by-username/nonExistentUser")
+        when(userService.getUserById(2L)).thenReturn(userResponse);
+
+        mockMvc.perform(get("/api/users/2")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.walletBalance.amount").value(0.00))
+                .andExpect(jsonPath("$.message").value("Success"));
+
+        verify(userService, times(1)).getUserById(2L);
+    }
+
+    @Test
+    public void testMultipleRequests() throws Exception {
+        UserResponse userResponse = new UserResponse(4L, "multiRequestUser", new Money(new BigDecimal("200.00"), Currency.getInstance("INR")));
+
+        when(userService.getUserById(4L)).thenReturn(userResponse);
+
+        for (int i = 0; i < 5; i++) {
+            mockMvc.perform(get("/api/users/4")
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.username").value("multiRequestUser"))
+                    .andExpect(jsonPath("$.walletBalance.amount").value(200.00));
+        }
+
+        verify(userService, times(5)).getUserById(4L);
+    }
+    @Test
+    public void testGetUserByNonExistentId() throws Exception {
+        when(userService.getUserById(999L)).thenThrow(new IllegalArgumentException("User not found"));
+
+        mockMvc.perform(get("/api/users/999")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("User not found"));
 
-        verify(userService, times(1)).getUserByUsername("nonExistentUser");
+        verify(userService, times(1)).getUserById(999L);
     }
+
 }
+

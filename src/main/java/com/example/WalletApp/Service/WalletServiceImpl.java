@@ -70,19 +70,14 @@ public class WalletServiceImpl implements WalletService {
         User receiver = userRepository.findById(receiverId)
                 .orElseThrow(() -> new IllegalArgumentException("🚨 Receiver not found!"));
 
-        System.out.println("Sender ID: " + sender.identify() + ", Receiver ID: " + receiver.identify());
-        System.out.println("Amount to Transfer: " + amount);
-        System.out.println(" Sender: " + sender.getUsername() + " | Balance: " + sender.getBalanceForResponse());
-        System.out.println(" Receiver: " + receiver.getUsername() + " | Balance: " + receiver.getBalanceForResponse());
-
         Money convertedAmount;
 
-        //  **Handle transfers within the same currency (skip unnecessary conversion)**
+        //  Handle transfers within the same currency (skip unnecessary conversion)
         if (sender.getCurrency().equals(receiver.getCurrency())) {
             System.out.println("Same currency transfer, skipping conversion.");
             convertedAmount = amount;
         } else {
-            // 🔄 Convert the currency
+            //Convert the currency
             System.out.println("🔄 Converting currency...");
             convertedAmount = currencyConversionService.convert(amount,
                     sender.getCurrency().getCurrencyCode(),
@@ -90,30 +85,25 @@ public class WalletServiceImpl implements WalletService {
 
             System.out.println(" Converted Amount: " + convertedAmount + " | Receiver Currency Before Update: " + receiver.getCurrency());
 
-            // 🛠 **Update receiver's wallet currency before deposit**
+            //**Update receiver's wallet currency before deposit
             System.out.println("🔄 Updating Receiver's Wallet Currency to: " + convertedAmount.getCurrency());
             receiver.updateWalletCurrency(convertedAmount.getCurrency(), currencyConversionService);
         }
 
         //  Withdraw from sender
-        System.out.println("💸 Withdrawing from Sender...");
         if (!sender.canWithdrawFromWallet(amount)) {
             throw new IllegalArgumentException("🚨 Insufficient balance!");
         }
         sender.withdrawFromWallet(amount);
-        System.out.println(" New Sender Balance: " + sender.getBalanceForResponse());
 
         //  Deposit to receiver
-        System.out.println(" Depositing to Receiver...");
         receiver.depositToWallet(convertedAmount);
-        System.out.println(" New Receiver Balance: " + receiver.getBalanceForResponse());
-
         //  Save updates
         userRepository.save(sender);
         userRepository.save(receiver);
 
         //  Record transactions
-        System.out.println(" Recording Transactions...");
+
         transactionRepository.save(new Transaction(sender, TransactionType.TRANSFER_OUT, amount));
         transactionRepository.save(new Transaction(receiver, TransactionType.TRANSFER_IN, convertedAmount));
 

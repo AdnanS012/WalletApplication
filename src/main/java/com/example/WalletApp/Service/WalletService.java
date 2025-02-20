@@ -11,4 +11,5 @@ public interface WalletService {
     Money getBalance(Long userId);
     void transferMoney(Long senderId, Long receiverId, Money amount);
     List<TransactionResponse> getTransactions(Long userId);
+
 }

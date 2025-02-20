@@ -28,8 +28,10 @@ public class UserResponse {
     public String username() {
         return username;
     }
-
-
+    @JsonProperty("message")
+    public String getMessages() {
+      return message;
+    }
 
     public void setMessage(String message) {
         this.message = message;
