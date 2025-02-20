@@ -27,7 +27,7 @@ public class Money {
     @JsonCreator
     public Money(@JsonProperty("amount")BigDecimal amount,@JsonProperty("currency") Currency currency){
         if (amount == null || amount.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Amount cannot be null");
+            throw new IllegalArgumentException("Amount cannot be zero or negative");
         }
         this.amount = amount;
         this.currency = currency;

@@ -6,32 +6,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
-
-
 @RestController
-@RequestMapping("/users/{userId}/wallet")
-public class WalletController {
+@RequestMapping("/users/{userId}")
+public class DepositController {
 
     private final WalletService walletService;
 
     @Autowired
-    public WalletController(WalletService walletService) {
+    public DepositController(WalletService walletService) {
         this.walletService = walletService;
     }
 
 
-    @GetMapping
-    public ResponseEntity<Money> getBalance(@PathVariable Long userId) {
+    @PostMapping("/deposit")
+    public ResponseEntity<String> deposit(@PathVariable Long userId, @RequestBody Money amount) {
         try {
-            Money balance = walletService.getBalance(userId);
-            return ResponseEntity.ok(balance);
+            walletService.deposit(userId, amount);
+            return ResponseEntity.ok("Deposit successful!");
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
-
 
 
 }

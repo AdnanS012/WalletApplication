@@ -59,16 +59,5 @@ public UserResponse getUserById(Long id) {
     return new UserResponse(user.identify(), user.getUsername(), user.getBalanceForResponse());
 }
 
-    @Override
-    public UserResponse getUserByUsername(String username) {
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new IllegalArgumentException("User not found");
-        }
-        return new UserResponse(user.identify(),user.getUsername(),user.getBalanceForResponse());
-    }
-
-
-
 }
 

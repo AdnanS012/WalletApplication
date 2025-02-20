@@ -78,15 +78,11 @@ public class WalletServiceImpl implements WalletService {
             convertedAmount = amount;
         } else {
             //Convert the currency
-            System.out.println("🔄 Converting currency...");
             convertedAmount = currencyConversionService.convert(amount,
                     sender.getCurrency().getCurrencyCode(),
                     receiver.getCurrency().getCurrencyCode());
 
-            System.out.println(" Converted Amount: " + convertedAmount + " | Receiver Currency Before Update: " + receiver.getCurrency());
-
             //**Update receiver's wallet currency before deposit
-            System.out.println("🔄 Updating Receiver's Wallet Currency to: " + convertedAmount.getCurrency());
             receiver.updateWalletCurrency(convertedAmount.getCurrency(), currencyConversionService);
         }
 
@@ -106,9 +102,7 @@ public class WalletServiceImpl implements WalletService {
 
         transactionRepository.save(new Transaction(sender, TransactionType.TRANSFER_OUT, amount));
         transactionRepository.save(new Transaction(receiver, TransactionType.TRANSFER_IN, convertedAmount));
-
-        System.out.println("🎯 Transfer completed!");
-    }
+ }
 
 
     @Override

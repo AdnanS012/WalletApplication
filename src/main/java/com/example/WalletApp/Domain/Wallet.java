@@ -15,7 +15,7 @@ public class Wallet {
      public Wallet(Money balance) {
          if (balance != null) {
              this.balance = balance;
-             this.currency = balance.getCurrency(); // ✅ Use balance's currency instead of defaulting to INR
+             this.currency = balance.getCurrency(); //  Use balance's currency instead of defaulting to INR
          } else {
              this.balance = Money.Zero;
              this.currency = Money.Zero.getCurrency(); // Default currency from Money.Zero
@@ -35,12 +35,7 @@ public class Wallet {
 
     public void deposit(Money amount) {
          validateCurrency(amount);
-        System.out.println("🔹 Before Deposit - Wallet Balance: " + this.balance);
-        System.out.println("🔹 Depositing Amount: " + amount);
-
         this.balance = this.balance.add(amount);
-        System.out.println("✅ After Deposit - Wallet Balance: " + this.balance);
-
     }
 
     public void withdraw(Money amount) {
@@ -68,7 +63,7 @@ public class Wallet {
 
     public void updateCurrency(Currency newCurrency, CurrencyConversionService currencyConversionService) {
         if (!this.currency.equals(newCurrency)) {
-            System.out.println("🔄 Updating Wallet Currency from " + this.currency + " to " + newCurrency);
+            System.out.println("Updating Wallet Currency from " + this.currency + " to " + newCurrency);
 
             // 🛑 Fix: Only convert if balance is NOT zero
             if (!this.balance.equals(Money.Zero)) {
