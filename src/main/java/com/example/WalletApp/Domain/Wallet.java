@@ -13,8 +13,14 @@ public class Wallet {
      private  Currency currency;
 
      public Wallet(Money balance) {
-        this.balance = balance!= null ? balance : Money.Zero;
-        this.currency = balance!= null ? balance.getCurrency() : Currency.getInstance("INR");
+         if (balance != null) {
+             this.balance = balance;
+             this.currency = balance.getCurrency(); // ✅ Use balance's currency instead of defaulting to INR
+         } else {
+             this.balance = Money.Zero;
+             this.currency = Money.Zero.getCurrency(); // Default currency from Money.Zero
+         }
+
     }
 
     protected Wallet(){

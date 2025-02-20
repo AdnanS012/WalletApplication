@@ -75,9 +75,7 @@ public class WalletServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            walletService.deposit(userId, depositAmount);
-        });
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> walletService.deposit(userId, depositAmount));
 
         assertEquals("User not found", exception.getMessage());
         verify(userRepository, never()).save(any(User.class));
@@ -132,9 +130,7 @@ public class WalletServiceTest {
 
         Money withdrawalAmount = new Money(new BigDecimal("100.00"),Currency.getInstance("INR"));
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            walletService.withdraw(1L, withdrawalAmount);
-        });
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> walletService.withdraw(1L, withdrawalAmount));
 
         assertTrue(exception.getMessage().contains("Insufficient balance"),
                 "Exception message should contain 'Insufficient balance'");
@@ -161,9 +157,7 @@ public class WalletServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
 
         // Act & Assert
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            walletService.withdraw(userId, withdrawAmount);
-        });
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> walletService.withdraw(userId, withdrawAmount));
 
         assertEquals("Insufficient balance", exception.getMessage());
         verify(userRepository, never()).save(any(User.class));
@@ -193,9 +187,7 @@ public class WalletServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            walletService.getBalance(userId);
-        });
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> walletService.getBalance(userId));
 
         assertEquals("User not found", exception.getMessage());
     }
@@ -266,9 +258,7 @@ public class WalletServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(sender));
         when(userRepository.findById(2L)).thenReturn(Optional.of(receiver));
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            walletService.transferMoney(1L, 2L, new Money(new BigDecimal("200.00"), Currency.getInstance("INR")));
-        });
+        Exception exception = assertThrows(IllegalArgumentException.class, () ->  walletService.transferMoney(1L, 2L, new Money(new BigDecimal("200.00"), Currency.getInstance("INR"))));
 
         assertEquals("🚨 Insufficient balance!", exception.getMessage());
 
@@ -285,13 +275,143 @@ public class WalletServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            walletService.transferMoney(1L, 2L, new Money(new BigDecimal("100.00"), Currency.getInstance("INR")));
-        });
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> walletService.transferMoney(1L, 2L, new Money(new BigDecimal("100.00"), Currency.getInstance("INR"))));
 
         assertEquals("🚨 Sender not found!", exception.getMessage());
 
         verify(transactionRepository, times(0)).save(any(Transaction.class));
     }
+
+    @Test
+    public void testTransferMoneyDifferentCurrency_USD_to_INR() {
+        sender = new User("sender", "password");
+
+        //  Ensure sender's wallet starts in USD
+        Money initialUsd = new Money(new BigDecimal("10.00"), Currency.getInstance("USD"));
+        ReflectionTestUtils.setField(sender, "wallet", new Wallet(initialUsd));
+
+        receiver = new User("receiver", "password");
+
+        //  Ensure receiver's wallet starts in INR
+        Money zeroInr = new Money(BigDecimal.ZERO, Currency.getInstance("INR"));
+        ReflectionTestUtils.setField(receiver, "wallet", new Wallet(zeroInr));
+
+        //  Manually set user IDs
+        ReflectionTestUtils.setField(sender, "id", 1L);
+        ReflectionTestUtils.setField(receiver, "id", 2L);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(sender));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(receiver));
+
+        // Mock currency conversion (10 USD -> 850 INR)
+        when(currencyConversionService.convert(
+                argThat(money -> money.getCurrency().equals(Currency.getInstance("USD"))),
+                eq("USD"),
+                eq("INR")
+        )).thenReturn(new Money(new BigDecimal("850.00"), Currency.getInstance("INR")));
+
+        // Execute Transfer
+        walletService.transferMoney(1L, 2L, new Money(new BigDecimal("10.00"), Currency.getInstance("USD")));
+
+        // Verify Transactions Saved
+        verify(transactionRepository, times(2)).save(any(Transaction.class));
+
+        // Assert Sender Balance
+        assertEquals(new Money(BigDecimal.ZERO, Currency.getInstance("USD")), sender.getBalanceForResponse());
+
+        // Assert Receiver Balance (should be ₹830.00)
+        assertEquals(new Money(new BigDecimal("850.00"), Currency.getInstance("INR")), receiver.getBalanceForResponse());
+    }
+    @Test
+    public void testTransferWithZeroAmount() {
+        sender = new User("sender", "password");
+        sender.depositToWallet(new Money(new BigDecimal("500.00"), Currency.getInstance("INR")));
+        receiver = new User("receiver", "password");
+        receiver.depositToWallet(new Money(BigDecimal.ZERO, Currency.getInstance("INR")));
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(sender));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(receiver));
+
+        walletService.transferMoney(1L, 2L, new Money(BigDecimal.ZERO, Currency.getInstance("INR")));
+
+        assertEquals(new Money(new BigDecimal("500.00"), Currency.getInstance("INR")), sender.getBalanceForResponse());
+        assertEquals(new Money(BigDecimal.ZERO, Currency.getInstance("INR")), receiver.getBalanceForResponse());
+    }
+    @Test
+    public void testTransferBetweenSameUser() {
+        sender = new User("sender", "password");
+        sender.depositToWallet(new Money(new BigDecimal("500.00"), Currency.getInstance("INR")));
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(sender));
+
+        walletService.transferMoney(1L, 1L, new Money(new BigDecimal("100.00"), Currency.getInstance("INR")));
+
+        assertEquals(new Money(new BigDecimal("500.00"), Currency.getInstance("INR")), sender.getBalanceForResponse());
+    }
+    @Test
+    public void testTransferMoney_SameCurrency_EUR_to_EUR() {
+        sender = new User("sender", "password");
+        Money initialEur = new Money(new BigDecimal("200.00"), Currency.getInstance("EUR"));
+        ReflectionTestUtils.setField(sender, "wallet", new Wallet(initialEur));
+
+        receiver = new User("receiver", "password");
+        Money zeroEur = new Money(BigDecimal.ZERO, Currency.getInstance("EUR"));
+        ReflectionTestUtils.setField(receiver, "wallet", new Wallet(zeroEur));
+
+        ReflectionTestUtils.setField(sender, "id", 1L);
+        ReflectionTestUtils.setField(receiver, "id", 2L);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(sender));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(receiver));
+
+        Money transferAmount = new Money(new BigDecimal("75.00"), Currency.getInstance("EUR"));
+
+        walletService.transferMoney(1L, 2L, transferAmount);
+
+        verify(transactionRepository, times(2)).save(any(Transaction.class));
+
+        // Check sender balance
+        assertEquals(new Money(new BigDecimal("125.00"), Currency.getInstance("EUR")), sender.getBalanceForResponse());
+
+        // Check receiver balance
+        assertEquals(new Money(new BigDecimal("75.00"), Currency.getInstance("EUR")), receiver.getBalanceForResponse());
+    }
+    @Test
+    public void testAtomicity_WalletServiceRollbackOnFailure() {
+        Long senderId = 1L;
+        Long receiverId = 2L;
+        Money transferAmount = new Money(new BigDecimal("500.00"), Currency.getInstance("USD"));
+        Money convertedAmount = new Money(new BigDecimal("41500.00"), Currency.getInstance("INR"));
+
+        User sender = new User("sender", "password");
+        User receiver = new User("receiver", "password");
+
+        ReflectionTestUtils.setField(sender, "wallet", new Wallet(transferAmount));
+        ReflectionTestUtils.setField(sender, "id", senderId);
+        ReflectionTestUtils.setField(receiver, "id", receiverId);
+
+        when(userRepository.findById(senderId)).thenReturn(Optional.of(sender));
+        when(userRepository.findById(receiverId)).thenReturn(Optional.of(receiver));
+
+        when(currencyConversionService.convert(any(), eq("USD"), eq("INR"))).thenReturn(convertedAmount);
+
+        doThrow(new RuntimeException("Simulated failure after sender withdrawal"))
+                .when(transactionRepository).save(any(Transaction.class));
+
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            walletService.transferMoney(senderId, receiverId, transferAmount);
+        });
+
+        assertEquals("Simulated failure after sender withdrawal", exception.getMessage());
+
+        verify(transactionRepository, never()).save(any(Transaction.class));
+
+        // Ensure rollback (sender still has full balance)
+        assertEquals(transferAmount, sender.getBalanceForResponse());
+
+        // Ensure receiver’s balance is still zero
+        assertEquals(new Money(BigDecimal.ZERO, Currency.getInstance("INR")), receiver.getBalanceForResponse());
+    }
+
 
 }

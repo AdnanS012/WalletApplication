@@ -25,6 +25,13 @@ public class TransactionResponse {
         return amount;
     }
 
+    public Long getId() {
+        return id;
+    }
+    public TransactionType getType() {
+        return type;
+    }
+
     public static TransactionResponse from(Transaction transaction) {
         return new TransactionResponse(
                 transaction.getId(),

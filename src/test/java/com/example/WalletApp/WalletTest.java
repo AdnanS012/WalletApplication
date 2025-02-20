@@ -98,6 +98,30 @@ public class WalletTest {
 
         assertEquals("Currency mismatch in wallet", exception.getMessage());
     }
+    @Test
+    public void testWalletInitializationWithDifferentCurrency() {
+        Money usdMoney = new Money(new BigDecimal("100.00"), Currency.getInstance("USD"));
+        Wallet wallet = new Wallet(usdMoney);
 
+        assertEquals(new BigDecimal("100.00"), wallet.provideBalance().getAmount());
+        assertEquals(Currency.getInstance("USD"), wallet.getCurrency());
+    }
+    @Test
+    public void testDepositWithDifferentCurrencyShouldFail() {
+        Wallet wallet = new Wallet(new Money(new BigDecimal("100.00"), Currency.getInstance("USD")));
+        Money depositAmount = new Money(new BigDecimal("50.00"), Currency.getInstance("INR"));
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            wallet.deposit(depositAmount);
+        });
+
+        assertEquals("Currency mismatch in wallet", exception.getMessage());
+    }
+    @Test
+    public void testWalletInitializationWithDefaultCurrency() {
+        Wallet wallet = Wallet.createDefaultWallet(); // Default constructor
+        assertEquals(Money.Zero, wallet.provideBalance());
+        assertEquals(Currency.getInstance("INR"), wallet.getCurrency()); // Default currency should be INR
+    }
 }
 

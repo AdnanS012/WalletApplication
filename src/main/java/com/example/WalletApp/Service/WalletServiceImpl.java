@@ -61,7 +61,7 @@ public class WalletServiceImpl implements WalletService {
         return user.getBalanceForResponse();
     }
 
-
+     @Transactional
     public void transferMoney(Long senderId, Long receiverId, Money amount) {
         System.out.println("🔄 Initiating money transfer...");
 

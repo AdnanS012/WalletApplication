@@ -34,7 +34,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(
                         "/h2-console/**",
-                        "/api/users/login"
+                        "/api/users/login",
+                        "/api/users"
                 ).permitAll()  // ✅ Allow public access to H2 console & user endpoints
                 .anyRequest().authenticated()
                 .and()
