@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users/{userId}")
+@RequestMapping("/users")
 public class TransactionController {
     private final WalletService walletService;
 
@@ -20,7 +20,7 @@ public class TransactionController {
         this.walletService = walletService;
     }
 
-    @PostMapping("/transactions/{receiverId}")
+    @PostMapping("/{userId}/transactions/{receiverId}")
     public ResponseEntity<String> transferMoney(@PathVariable Long userId, @PathVariable Long receiverId, @RequestBody Money amount) {
         try {
             walletService.transferMoney(userId, receiverId, amount);
@@ -33,13 +33,23 @@ public class TransactionController {
 
     }
 
-    @GetMapping("/transactions")
-    public ResponseEntity<List<TransactionResponse>> getTransactions(@PathVariable Long userId) {
+    @GetMapping("/{userId}/transactions")
+    public ResponseEntity <TransactionResponse> getTransactions(@PathVariable Long userId) {
         try {
-            List<TransactionResponse> transactions = walletService.getTransactions(userId);
+            TransactionResponse transactions = walletService.getTransactionById(userId);
             return ResponseEntity.ok(transactions);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+@GetMapping("/transactions")
+public ResponseEntity<List<TransactionResponse>> getTransactions() {
+    try {
+        List<TransactionResponse> transactions = walletService.getTransactions();
+        return ResponseEntity.ok(transactions);
+    } catch (IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(null);
+    }
+}
 }

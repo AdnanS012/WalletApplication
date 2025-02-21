@@ -106,13 +106,20 @@ public class WalletServiceImpl implements WalletService {
 
 
     @Override
-    public List<TransactionResponse> getTransactions(Long userId) {
-   List<Transaction> transactions = transactionRepository.findByUserId(userId);
-        if (transactions == null || transactions.isEmpty()) {
+    public List<TransactionResponse> getTransactions() {
+   List<Transaction> transactions = transactionRepository.findAll();
+        if (transactions.isEmpty()) {
             throw new IllegalArgumentException("No transactions found");
         }
    return transactions.stream()
            .map(TransactionResponse::from)
            .collect(Collectors.toList());
+    }
+
+    @Override
+    public TransactionResponse getTransactionById(Long id) {
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+        return TransactionResponse.from(transaction);
     }
 }

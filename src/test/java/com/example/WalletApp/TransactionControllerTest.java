@@ -93,17 +93,17 @@ public class TransactionControllerTest {
                 new TransactionResponse(2L, 1L, new Money(new BigDecimal("50.00"),Currency.getInstance("INR")), TransactionType.WITHDRAWAL, LocalDateTime.now())
         );
 
-        when(walletService.getTransactions(eq(userId))).thenReturn(transactions);
+        when(walletService.getTransactions()).thenReturn(transactions);
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
 
-        mockMvc.perform(get("/users/1/transactions")
+        mockMvc.perform(get("/users/transactions")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(transactions)));
 
-        verify(walletService, times(1)).getTransactions(eq(userId));
+        verify(walletService, times(1)).getTransactions();
     }
 
     @Test
