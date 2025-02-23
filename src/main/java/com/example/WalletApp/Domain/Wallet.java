@@ -65,18 +65,6 @@ public class Wallet {
         }
     }
 
-//    public void updateCurrency(Currency newCurrency, CurrencyConversionService currencyConversionService) {
-//        if (!this.currency.equals(newCurrency)) {
-//            System.out.println("Updating Wallet Currency from " + this.currency + " to " + newCurrency);
-//
-//            //  Fix: Only convert if balance is NOT zero
-//            if (!this.balance.equals(Money.Zero)) {
-//                this.balance = currencyConversionService.convert(this.balance, this.currency.getCurrencyCode(), newCurrency.getCurrencyCode());
-//            }
-//
-//            this.currency = newCurrency;
-//        }
-//    }
 public void updateCurrency(Currency newCurrency, CurrencyConversionService currencyConversionService) {
     if (!this.balance.getCurrency().equals(newCurrency)) {
         System.out.println("Updating Wallet Currency from " + this.balance.getCurrency() + " to " + newCurrency);

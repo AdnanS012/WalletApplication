@@ -16,7 +16,7 @@ public class Money {
 
     @Column(precision = 19, scale = 2)
     private BigDecimal amount;
-    @Column(nullable = false)
+
     private Currency currency;
 
     protected Money(){
