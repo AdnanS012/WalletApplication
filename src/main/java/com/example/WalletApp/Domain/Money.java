@@ -30,7 +30,7 @@ public class Money {
             throw new IllegalArgumentException("Amount cannot be zero or negative");
         }
         this.amount = amount;
-        this.currency = currency;
+        this.currency = (currency != null) ? currency : STANDARD_CURRENCY;
     }
 
     public Money add(Money money){
@@ -38,13 +38,9 @@ public class Money {
             throw new IllegalArgumentException("Money cannot be null");
         }
         validateCurrency(money);
-        System.out.println("💰 Money Add Called: " + this + " + " + money);
         Money result = new Money(this.amount.add(money.amount), this.currency);
-
-        System.out.println("➡️ Result after Addition: " + result);
         return result;
 
-       // return new Money(this.amount.add(money.amount),this.currency);
     }
 
     public Money subtract(Money money){

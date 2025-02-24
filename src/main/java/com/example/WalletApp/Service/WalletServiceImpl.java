@@ -63,8 +63,6 @@ public class WalletServiceImpl implements WalletService {
 
      @Transactional
     public void transferMoney(Long senderId, Long receiverId, Money amount) {
-        System.out.println("🔄 Initiating money transfer...");
-
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new IllegalArgumentException("🚨 Sender not found!"));
         User receiver = userRepository.findById(receiverId)
@@ -74,7 +72,6 @@ public class WalletServiceImpl implements WalletService {
 
         //  Handle transfers within the same currency (skip unnecessary conversion)
         if (sender.getCurrency().equals(receiver.getCurrency())) {
-            System.out.println("Same currency transfer, skipping conversion.");
             convertedAmount = amount;
         } else {
             //Convert the currency

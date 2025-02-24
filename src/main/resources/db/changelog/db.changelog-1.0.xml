@@ -48,7 +48,7 @@
         <addForeignKeyConstraint
                 baseTableName="transactions"
                 baseColumnNames="user_id"
-                referencedTableName="users"
+                referencedTableName="userstbl"
                 referencedColumnNames="id"
                 constraintName="fk_transactions_users"/>
     </changeSet>
