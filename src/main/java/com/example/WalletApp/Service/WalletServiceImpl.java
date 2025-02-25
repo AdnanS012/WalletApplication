@@ -64,9 +64,9 @@ public class WalletServiceImpl implements WalletService {
      @Transactional
     public void transferMoney(Long senderId, Long receiverId, Money amount) {
         User sender = userRepository.findById(senderId)
-                .orElseThrow(() -> new IllegalArgumentException("🚨 Sender not found!"));
+                .orElseThrow(() -> new IllegalArgumentException(" Sender not found!"));
         User receiver = userRepository.findById(receiverId)
-                .orElseThrow(() -> new IllegalArgumentException("🚨 Receiver not found!"));
+                .orElseThrow(() -> new IllegalArgumentException(" Receiver not found!"));
 
         Money convertedAmount;
 

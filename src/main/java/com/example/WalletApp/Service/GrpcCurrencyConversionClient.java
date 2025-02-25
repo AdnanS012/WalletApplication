@@ -1,15 +1,25 @@
-package com.example.WalletApp.grpcClient;
+package com.example.WalletApp.Service;
 
-import net.devh.boot.grpc.client.inject.GrpcClient;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import org.springframework.stereotype.Service;
 import pb.CurrencyConverterGrpc;
 import pb.CurrencyConverterOuterClass;
 
 @Service
-public class GrpcCurrencyConversion {
+public class GrpcCurrencyConversionClient {
 
-    @GrpcClient("currency-converter")
+
     private CurrencyConverterGrpc.CurrencyConverterBlockingStub currencyConverterStub;
+
+    public GrpcCurrencyConversionClient() {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+                .usePlaintext()
+                .build();
+        currencyConverterStub = CurrencyConverterGrpc.newBlockingStub(channel);
+    }
+
+
 
     public double convertCurrency(String from, String to, double amount){
         CurrencyConverterOuterClass.ConvertRequest request = CurrencyConverterOuterClass.ConvertRequest.newBuilder()
