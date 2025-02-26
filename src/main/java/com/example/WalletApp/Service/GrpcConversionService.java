@@ -1,6 +1,7 @@
 package com.example.WalletApp.Service;
 
 import org.springframework.stereotype.Service;
+import pb.CurrencyConverterOuterClass;
 
 @Service
 public class GrpcConversionService {
@@ -10,7 +11,8 @@ public class GrpcConversionService {
         this.grpcCurrencyConversionClient = grpcCurrencyConversionClient;
     }
 
-    public double convertCurrency(String from, String to, double amount) {
-        return grpcCurrencyConversionClient.convertCurrency(from, to, amount);
+    public CurrencyConverterOuterClass.Money convertCurrency(String fromCurrency, String toCurrency,double amount) {
+        return grpcCurrencyConversionClient.convertCurrency(fromCurrency, toCurrency,amount);
     }
+
 }

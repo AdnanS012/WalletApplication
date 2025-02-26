@@ -277,7 +277,7 @@ public class WalletServiceTest {
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> walletService.transferMoney(1L, 2L, new Money(new BigDecimal("100.00"), Currency.getInstance("INR"))));
 
-        assertEquals("🚨 Sender not found!", exception.getMessage());
+        assertEquals(" Sender not found!", exception.getMessage());
 
         verify(transactionRepository, times(0)).save(any(Transaction.class));
     }
@@ -377,6 +377,26 @@ public class WalletServiceTest {
         assertEquals(new Money(new BigDecimal("75.00"), Currency.getInstance("EUR")), receiver.getBalanceForResponse());
     }
 
+    @Test
+    public void testDepositInUSD() {
+        // Arrange
+        Long userId = 1L;
+        Money depositAmount = new Money(new BigDecimal("100.00"), Currency.getInstance("USD"));
+        User mockUser = new User("testUser", "securePassword");
+
+        // Initialize the user's wallet with USD currency
+        Money initialBalance = new Money(BigDecimal.ZERO, Currency.getInstance("USD"));
+        ReflectionTestUtils.setField(mockUser, "wallet", new Wallet(initialBalance));
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
+
+        // Act
+        walletService.deposit(userId, depositAmount);
+
+        // Assert
+        assertEquals(depositAmount, mockUser.getBalanceForResponse());
+        verify(userRepository, times(1)).save(mockUser);
+    }
 
 
 }

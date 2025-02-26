@@ -21,13 +21,24 @@ public class GrpcCurrencyConversionClient {
 
 
 
-    public double convertCurrency(String from, String to, double amount){
-        CurrencyConverterOuterClass.ConvertRequest request = CurrencyConverterOuterClass.ConvertRequest.newBuilder()
-                .setFromCurrency(from)
-                .setToCurrency(to)
+    public CurrencyConverterOuterClass.Money convertCurrency(String from, String to, double amount) {
+        // Create Money object
+        CurrencyConverterOuterClass.Money money = CurrencyConverterOuterClass.Money.newBuilder()
                 .setAmount(amount)
+                .setCurrency(from)  // Set source currency inside Money
                 .build();
+
+        // Create ConvertRequest
+        CurrencyConverterOuterClass.ConvertRequest request = CurrencyConverterOuterClass.ConvertRequest.newBuilder()
+                .setAmount(money)  // Set the Money object
+                .setToCurrency(to)  // Set target currency
+                .build();
+
+        // Call gRPC server
         CurrencyConverterOuterClass.ConvertResponse response = currencyConverterStub.convert(request);
+
+        // Extract converted amount from Money object inside response
         return response.getConvertedAmount();
     }
+
 }

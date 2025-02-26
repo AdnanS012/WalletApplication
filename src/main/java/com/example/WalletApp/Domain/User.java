@@ -47,7 +47,11 @@ public class User implements UserDetails {
     }
 
     public void depositToWallet(Money amount){
+        System.out.println("📥 Depositing amount: " + amount + " into wallet with currency: " + this.wallet.provideBalance().getCurrency());
+
         wallet.deposit(amount);
+        System.out.println("✅ New Wallet Balance: " + this.wallet.provideBalance());
+
     }
 
     public void withdrawFromWallet(Money amount){

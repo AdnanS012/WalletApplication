@@ -4,16 +4,20 @@ package pb;
 
 option go_package = "/pb";
 
+message Money {
+  double amount = 1;
+  string currency = 2;
+}
+
 service CurrencyConverter {
-  rpc Convert (ConvertRequest) returns (ConvertResponse);
+  rpc Convert(ConvertRequest) returns (ConvertResponse);
 }
 
 message ConvertRequest {
-  string from_currency = 1;
+  Money amount = 1;
   string to_currency = 2;
-  double amount = 3;
 }
 
 message ConvertResponse {
-  double converted_amount = 1;
+  Money converted_amount = 1;
 }

@@ -21,6 +21,9 @@ public class DepositController {
     @PostMapping("/deposit")
     public ResponseEntity<String> deposit(@PathVariable Long userId, @RequestBody Money amount) {
         try {
+            System.out.println("Received deposit request: " + amount);
+            System.out.println("Amount: " + amount.getAmount() + ", Currency: " + amount.getCurrency());
+
             walletService.deposit(userId, amount);
             return ResponseEntity.ok("Deposit successful!");
         } catch (IllegalArgumentException e) {

@@ -76,6 +76,7 @@ public void updateCurrency(Currency newCurrency, CurrencyConversionService curre
                     newCurrency.getCurrencyCode()
             );
         }
+        System.out.println("✅ Currency update complete: " + this.balance.getCurrency());
 
         //  Now, the balance object already holds the new currency
     }

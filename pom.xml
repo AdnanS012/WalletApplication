@@ -29,6 +29,17 @@
 	<properties>
 		<java.version>8</java.version>
 	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>io.grpc</groupId>
+				<artifactId>grpc-bom</artifactId>
+				<version>1.61.0</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -99,24 +110,21 @@
 		<dependency>
 			<groupId>io.grpc</groupId>
 			<artifactId>grpc-netty-shaded</artifactId>
-			<version> 1.61.0</version>
 		</dependency>
 		<dependency>
 			<groupId>io.grpc</groupId>
 			<artifactId>grpc-protobuf</artifactId>
-			<version> 1.61.0</version>
+
 		</dependency>
 		<dependency>
 			<groupId>io.grpc</groupId>
 			<artifactId>grpc-stub</artifactId>
-			<version> 1.61.0</version>
 		</dependency>
 		<dependency>
-			<groupId>io.github.lognet</groupId>
-			<artifactId>grpc-spring-boot-starter</artifactId>
-			<version>4.5.9</version>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-inprocess</artifactId>
+			<version>1.64.0</version>
 		</dependency>
-
 		<dependency>
 			<groupId>net.devh</groupId>
 			<artifactId>grpc-spring-boot-starter</artifactId>

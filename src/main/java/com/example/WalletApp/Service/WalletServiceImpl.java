@@ -34,6 +34,7 @@ public class WalletServiceImpl implements WalletService {
     public void deposit(Long userId, Money amount){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
         user.depositToWallet(amount);
         userRepository.save(user);
       transactionRepository.save(new Transaction(user, TransactionType.DEPOSIT,amount));
@@ -67,7 +68,10 @@ public class WalletServiceImpl implements WalletService {
                 .orElseThrow(() -> new IllegalArgumentException(" Sender not found!"));
         User receiver = userRepository.findById(receiverId)
                 .orElseThrow(() -> new IllegalArgumentException(" Receiver not found!"));
-
+         System.out.println(" Transfer Request - Sender: " + sender.getUsername() + ", Receiver: " + receiver.getUsername());
+         System.out.println("   - Sender Balance: " + sender.getBalanceForResponse());
+         System.out.println("   - Receiver Balance: " + receiver.getBalanceForResponse());
+         System.out.println("   - Transfer Amount: " + amount);
         Money convertedAmount;
 
         //  Handle transfers within the same currency (skip unnecessary conversion)
@@ -78,9 +82,10 @@ public class WalletServiceImpl implements WalletService {
             convertedAmount = currencyConversionService.convert(amount,
                     sender.getCurrency().getCurrencyCode(),
                     receiver.getCurrency().getCurrencyCode());
+            System.out.println("💱 Converted Amount: " + convertedAmount);
+            receiver.updateWalletCurrency(convertedAmount.getCurrency(), currencyConversionService);
 
             //**Update receiver's wallet currency before deposit
-            receiver.updateWalletCurrency(convertedAmount.getCurrency(), currencyConversionService);
         }
 
         //  Withdraw from sender
@@ -88,10 +93,11 @@ public class WalletServiceImpl implements WalletService {
             throw new IllegalArgumentException("🚨 Insufficient balance!");
         }
         sender.withdrawFromWallet(amount);
+         System.out.println("✅ Sender new balance: " + sender.getBalanceForResponse());
 
         //  Deposit to receiver
         receiver.depositToWallet(convertedAmount);
-        //  Save updates
+         //  Save updates
         userRepository.save(sender);
         userRepository.save(receiver);
 

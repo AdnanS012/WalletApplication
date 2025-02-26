@@ -1,7 +1,9 @@
 package com.example.WalletApp.Domain;
 
+import com.example.WalletApp.CurrencyDeserializer;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -17,6 +19,7 @@ public class Money {
     @Column(precision = 19, scale = 2)
     private BigDecimal amount;
 
+    @JsonDeserialize(using = CurrencyDeserializer.class)  //Use the custom deserializer
     private Currency currency;
 
     protected Money(){
@@ -30,7 +33,7 @@ public class Money {
             throw new IllegalArgumentException("Amount cannot be zero or negative");
         }
         this.amount = amount;
-        this.currency = (currency != null) ? currency : STANDARD_CURRENCY;
+        this.currency = currency;
     }
 
     public Money add(Money money){
@@ -52,8 +55,11 @@ public class Money {
     }
 
     private void validateCurrency(Money money){
-        if (!this.currency.equals(money.currency)) {
-            throw new IllegalArgumentException("Currency mismatch");
+        System.out.println("Wallet Currency: " + this.getCurrency());
+        System.out.println("Incoming Money Currency: " + money.currency); // Log incoming money currency
+
+        if (!this.currency.equals(money.getCurrency())) {
+            throw new IllegalArgumentException("Currency mismatch"+ this.currency + " vs" + money.getCurrency());
         }
     }
 
