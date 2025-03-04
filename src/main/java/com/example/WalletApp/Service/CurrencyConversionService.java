@@ -3,7 +3,6 @@ package com.example.WalletApp.Service;
 import com.example.WalletApp.Domain.Money;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pb.CurrencyConverterOuterClass;
 
 import java.math.BigDecimal;
 import java.util.Currency;
@@ -11,11 +10,12 @@ import java.util.Currency;
 @Service
 public class CurrencyConversionService {
 
-    private final GrpcCurrencyConversionClient grpcClient;
+    private final HttpCurrencyConversionClient httpClient;
 
     @Autowired
-    public CurrencyConversionService(GrpcCurrencyConversionClient grpcClient) {
-        this.grpcClient = grpcClient;
+    public CurrencyConversionService(HttpCurrencyConversionClient httpClient) {
+        this.httpClient = httpClient;
+
     }
 
     public Money convert(Money amount, String fromCurrency, String toCurrency) {
@@ -29,15 +29,13 @@ public class CurrencyConversionService {
             return amount;
         }
 
-        // Call gRPC to get the converted money
-        CurrencyConverterOuterClass.Money convertedMoney = grpcClient.convertCurrency(
-                 fromCurrency, toCurrency,amount.getAmount().doubleValue());
+        // Call HTTP-based currency conversion service
+        Money convertedMoney = httpClient.convertCurrency(
+                fromCurrency, toCurrency, amount.getAmount().doubleValue());
+
         System.out.println("✅ Converted Amount: " + convertedMoney);
 
-        return new Money(
-                BigDecimal.valueOf(convertedMoney.getAmount()),
-                Currency.getInstance(convertedMoney.getCurrency())
-        );
+        return convertedMoney;
     }
 
 }
