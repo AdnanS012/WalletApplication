@@ -1,0 +1,24 @@
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: walletapp-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: wallet_user
+      POSTGRES_PASSWORD: wallet_pass
+      POSTGRES_DB: wallet_db
+    ports:
+      - "5432:5432"
+
+  walletapp:
+    build: .
+    container_name: walletapp-service
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/wallet_db
+      SPRING_DATASOURCE_USERNAME: wallet_user
+      SPRING_DATASOURCE_PASSWORD: wallet_pass
+    ports:
+      - "8081:8081"
